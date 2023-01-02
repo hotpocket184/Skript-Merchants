@@ -1,0 +1,6 @@
+name: skript-merchants
+version: '${project.version}'
+main: me.hotpocket.skriptmerchants.SkriptMerchants
+api-version: 1.16
+depend: [ Skript ]
+authors: [ hotpocket184 ]
