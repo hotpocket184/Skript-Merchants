@@ -2,14 +2,18 @@ package me.hotpocket.skriptmerchants;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +54,6 @@ public final class SkriptMerchants extends JavaPlugin implements Listener {
             log("§7[§bskript-merchants§7] §cYou are running an §noutdated version§r §cof skript-merchants!");
             updated = false;
         }
-        log("§c[skript-merchants] Remember to change the resource ID!");
     }
 
     @Override
@@ -69,10 +72,9 @@ public final class SkriptMerchants extends JavaPlugin implements Listener {
     }
 
     private String getVersion() {
-        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=96702").openStream(); Scanner scanner = new Scanner(inputStream)) {
-            if (scanner.hasNext()) {
-                return scanner.next();
-            }
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/hotpocket184/Skript-Merchants/releases/latest").openStream()));
+            return new Gson().fromJson(reader, JsonObject.class).get("tag_name").getAsString();
         } catch (IOException exception) {
             this.getLogger().info("Unable to check for updates: " + exception.getMessage());
         }
