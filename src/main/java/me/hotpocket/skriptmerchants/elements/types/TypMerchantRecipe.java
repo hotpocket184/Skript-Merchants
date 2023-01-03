@@ -1,5 +1,6 @@
 package me.hotpocket.skriptmerchants.elements.types;
 
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.lang.ParseContext;
@@ -15,7 +16,7 @@ public class TypMerchantRecipe {
                     .user("merchant ?recipes?")
                     .name("Merchant Recipe")
                     .description("Represents a merchant recipe.")
-                    .since("3.0")
+                    .since("1.0")
                     .parser(new Parser<>() {
                         @Override
                         public @Nullable MerchantRecipe parse(String s, ParseContext context) {
@@ -29,12 +30,15 @@ public class TypMerchantRecipe {
 
                         @Override
                         public String toString(MerchantRecipe o, int flags) {
-                            return o.toString();
+                            return toVariableNameString(o);
                         }
 
                         @Override
                         public String toVariableNameString(MerchantRecipe o) {
-                            return "merchantrecipe: " + o.toString();
+                            if (o.getIngredients().get(1) != null) {
+                                return new ItemType(o.getIngredients().get(0)) + " and " + new ItemType(o.getIngredients().get(1)) + " for " + new ItemType(o.getResult());
+                            }
+                            return new ItemType(o.getIngredients().get(0)) + " for " + new ItemType(o.getResult());
                         }
                     })
             );
