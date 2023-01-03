@@ -39,7 +39,7 @@ public class ExprIgnoreDiscounts extends SimplePropertyExpression<MerchantRecipe
 
     @Override
     public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
-        for (MerchantRecipe recipe : getExpr().getAll(event)) {
+        for (MerchantRecipe recipe : getExpr().getArray(event)) {
             switch (mode) {
                 case SET:
                     if (delta != null)

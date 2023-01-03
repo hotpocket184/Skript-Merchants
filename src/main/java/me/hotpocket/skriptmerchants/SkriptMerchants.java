@@ -4,7 +4,9 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import me.hotpocket.skriptmerchants.listeners.JoinListener;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -20,12 +22,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public final class SkriptMerchants extends JavaPlugin implements Listener {
+public final class SkriptMerchants extends JavaPlugin {
 
     private static SkriptMerchants instance;
     private SkriptAddon addon;
-    private static List<UUID> joined = new ArrayList<>();
-    private static boolean updated = true;
 
     public static SkriptMerchants getInstance() {
         return instance;
@@ -38,7 +38,7 @@ public final class SkriptMerchants extends JavaPlugin implements Listener {
         this.addon = Skript.registerAddon(this);
         this.addon.setLanguageFileDirectory("lang");
 
-        Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
 
         try {
             this.addon.loadClasses("me.hotpocket.skriptmerchants", "elements");
@@ -46,13 +46,13 @@ public final class SkriptMerchants extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
 
-        log("§7[§bskript-merchants§7] §fChecking for updates...");
+        log("&7[&bskript-merchants&7] &fChecking for updates...");
         if (getDescription().getVersion().equals(getVersion())) {
-            log("§7[§bskript-merchants§7] §aNo updates found!");
-            updated = true;
+            log("&7[&bskript-merchants&7] &aNo updates found!");
+            JoinListener.updated = true;
         } else {
-            log("§7[§bskript-merchants§7] §cYou are running an §noutdated version§r §cof skript-merchants!");
-            updated = false;
+            log("&7[&bskript-merchants&7] &cYou are running an &noutdated version&r &cof skript-merchants!");
+            JoinListener.updated = false;
         }
     }
 
@@ -61,27 +61,17 @@ public final class SkriptMerchants extends JavaPlugin implements Listener {
         // Plugin shutdown logic
     }
 
-    @EventHandler
-    private void onJoin(PlayerJoinEvent event) {
-        if (!updated) {
-            if (event.getPlayer().isOp() && !joined.contains(event.getPlayer().getUniqueId())) {
-                event.getPlayer().sendMessage("§7[§bskript-merchants§7] §cYou are running an §noutdated version§r §cof skript-merchants!");
-                joined.add(event.getPlayer().getUniqueId());
-            }
-        }
-    }
-
     private String getVersion() {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new URL("https://api.github.com/repos/hotpocket184/Skript-Merchants/releases/latest").openStream()));
             return new Gson().fromJson(reader, JsonObject.class).get("tag_name").getAsString();
         } catch (IOException exception) {
-            this.getLogger().info("Unable to check for updates: " + exception.getMessage());
+            log("&7[&bskript-merchants&7] &cUnable to check for updates!");
         }
         return "";
     }
 
     private void log(String text) {
-        getServer().getConsoleSender().sendMessage(text);
+        getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', text));
     }
 }

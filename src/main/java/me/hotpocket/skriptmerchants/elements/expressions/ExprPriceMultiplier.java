@@ -8,10 +8,10 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ExprPriceMultiplier extends SimplePropertyExpression<MerchantRecipe, Number> {
+public class ExprPriceMultiplier extends SimplePropertyExpression<MerchantRecipe, Float> {
 
     static {
-        register(ExprPriceMultiplier.class, Number.class, "price multiplier", "merchantrecipes");
+        register(ExprPriceMultiplier.class, Float.class, "price multiplier", "merchantrecipes");
     }
 
     @Override
@@ -20,13 +20,13 @@ public class ExprPriceMultiplier extends SimplePropertyExpression<MerchantRecipe
     }
 
     @Override
-    public @Nullable Number convert(MerchantRecipe merchantRecipe) {
+    public @Nullable Float convert(MerchantRecipe merchantRecipe) {
         return merchantRecipe.getPriceMultiplier();
     }
 
     @Override
-    public @NotNull Class<? extends Number> getReturnType() {
-        return Number.class;
+    public @NotNull Class<? extends Float> getReturnType() {
+        return Float.class;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ExprPriceMultiplier extends SimplePropertyExpression<MerchantRecipe
 
     @Override
     public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
-        for (MerchantRecipe recipe : getExpr().getAll(event)) {
+        for (MerchantRecipe recipe : getExpr().getArray(event)) {
             switch (mode) {
                 case SET:
                     if (delta != null)

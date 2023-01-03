@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 public class ExprMerchantRecipe extends SimpleExpression<MerchantRecipe> {
 
     static {
-        Skript.registerExpression(ExprMerchantRecipe.class, MerchantRecipe.class, ExpressionType.SIMPLE, "%itemtype% [and %-itemtype%] for %itemtype%");
+        Skript.registerExpression(ExprMerchantRecipe.class, MerchantRecipe.class, ExpressionType.COMBINED, "%itemtype% [and %-itemtype%] for %itemtype%");
     }
 
     private Expression<ItemType> firstIngredient, result;

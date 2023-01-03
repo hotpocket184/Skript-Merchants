@@ -2,6 +2,7 @@ package me.hotpocket.skriptmerchants.elements.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -18,23 +19,22 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExprTradeOfMerchant extends SimpleExpression<MerchantRecipe> {
+public class ExprTradeOfMerchant extends PropertyExpression<Inventory, MerchantRecipe> {
 
     static {
-        Skript.registerExpression(ExprTradeOfMerchant.class, MerchantRecipe.class, ExpressionType.SIMPLE, "[the] trade %integer% of %inventories%");
+        register(ExprTradeOfMerchant.class, MerchantRecipe.class, "trade %number%", "merchantinventories");
     }
 
-    private Expression<Integer> tradeNumber;
-    private Expression<Inventory> merchantInventory;
+    private Expression<Number> tradeNumber;
 
     @Override
-    protected @Nullable MerchantRecipe[] get(Event e) {
+    protected MerchantRecipe[] get(Event e, Inventory[] source) {
         Number tradeNumber = this.tradeNumber.getSingle(e);
         if (tradeNumber == null)
             return null;
         int trade = tradeNumber.intValue();
         List<MerchantRecipe> recipes = new ArrayList<>();
-        for (Inventory inventory : merchantInventory.getArray(e)) {
+        for (Inventory inventory : source) {
             if (inventory instanceof MerchantInventory merchant) {
                 if (merchant.getMerchant().getRecipeCount() >= trade)
                     recipes.add(merchant.getMerchant().getRecipe(trade - 1));
@@ -44,25 +44,19 @@ public class ExprTradeOfMerchant extends SimpleExpression<MerchantRecipe> {
     }
 
     @Override
-    public boolean isSingle() {
-        return merchantInventory.isSingle();
-    }
-
-    @Override
     public Class<? extends MerchantRecipe> getReturnType() {
         return MerchantRecipe.class;
     }
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "trade " + tradeNumber.toString(e, debug) + " of " + merchantInventory.toString(e, debug);
+        return "trade " + tradeNumber.toString(e, debug) + " of " + getExpr().toString(e, debug);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        tradeNumber = (Expression<Integer>) exprs[0];
-        merchantInventory = (Expression<Inventory>) exprs[1];
+        tradeNumber = (Expression<Number>) exprs[0];
         return true;
     }
 
@@ -76,8 +70,8 @@ public class ExprTradeOfMerchant extends SimpleExpression<MerchantRecipe> {
 
     @Override
     public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
-        int slot = tradeNumber.getSingle(e);
-        for (Inventory inventory : merchantInventory.getArray(e)) {
+        int slot = tradeNumber.getSingle(e).intValue();
+        for (Inventory inventory : getExpr().getArray(e)) {
             if (inventory instanceof MerchantInventory merchant) {
                 switch (mode) {
                     case SET -> {

@@ -31,12 +31,13 @@ public class ExprAllTradesOfMerchant extends SimpleExpression<MerchantRecipe> {
 
     @Override
     protected @Nullable MerchantRecipe[] get(Event e) {
-        for (Inventory inventory : inventories.getAll(e)) {
+        List<MerchantRecipe> recipes = new ArrayList<>();
+        for (Inventory inventory : inventories.getArray(e)) {
             if (inventory instanceof MerchantInventory merchant) {
-                return merchant.getMerchant().getRecipes().toArray(new MerchantRecipe[merchant.getMerchant().getRecipes().size()]);
+                recipes.addAll(merchant.getMerchant().getRecipes());
             }
         }
-        return null;
+        return recipes.toArray(new MerchantRecipe[0]);
     }
 
     @Override
